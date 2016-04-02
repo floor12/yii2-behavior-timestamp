@@ -8,9 +8,11 @@ use common\models\User;
 use yii\validators\Validator;
 use yii;
 
-class TimestampBehavior extends Behavior {
+class TimestampBehavior extends Behavior
+{
 
-    static public function attributeLabels() {
+    static public function attributeLabels()
+    {
         return [
             'created' => 'Создано',
             'updated' => 'Обновлено',
@@ -21,31 +23,39 @@ class TimestampBehavior extends Behavior {
         ];
     }
 
-    public function events() {
+    public function events()
+    {
         return [
             ActiveRecord::EVENT_BEFORE_VALIDATE => 'beforeValidate',
             ActiveRecord::EVENT_BEFORE_INSERT => 'beforeInsert',
         ];
     }
 
-    public function beforeValidate() {
-        $this->owner->create_user_id = Yii::$app->user->id;
+    public function beforeValidate()
+    {
+        if (isset(Yii::$app->user))
+            $this->owner->create_user_id = Yii::$app->user->id;
         $this->owner->updated = date("Y-m-d H:i:s");
     }
 
-    public function beforeInsert() {
-        $this->owner->create_user_id = Yii::$app->user->id;
+    public function beforeInsert()
+    {
+        if (isset(Yii::$app->user))
+            $this->owner->create_user_id = Yii::$app->user->id;
     }
 
-    public function getCreator() {
+    public function getCreator()
+    {
         return User::find($this->owner->create_user_id);
     }
 
-    public function getUpdator() {
+    public function getUpdator()
+    {
         return User::find($this->owner->update_user_id);
     }
 
-    public function attach($owner) {
+    public function attach($owner)
+    {
         parent::attach($owner);
         $validators = $owner->validators;
         $validatorInt = Validator::createValidator('integer', $owner, ['create_user_id', 'update_user_id']);
